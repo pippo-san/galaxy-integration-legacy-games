@@ -1,0 +1,11 @@
+{
+    "name": "Legacy Games plugin",
+    "platform": "test",
+    "guid": "73d2c048-1ae7-46b2-ad4a-da16ac8ccecc",
+    "version": "0.1",
+    "description": "Legacy Games plugin",
+    "author": "pippo-san",
+    "email": "",
+    "url": "",
+    "script": "plugin.py"
+}

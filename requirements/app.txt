@@ -1,0 +1,2 @@
+galaxy.plugin.api==0.69
+galaxyutils==0.1.5
