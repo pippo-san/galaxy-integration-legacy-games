@@ -13,6 +13,7 @@ from galaxy.proc_tools import process_iter
 
 from client import LegacyGamesClient
 from utils import get_uninstall_programs_list
+from game_fixes import check_available_fixes
 
 __version__ = 0.1
 
@@ -101,14 +102,20 @@ class LegacyGamesPlugin(Plugin):
                 # lista Galaxy dei giochi
                 logger.info("Game " + program['id'] + " added to games cache")
 
-                self.owned_games_cache.append(
-                    Game(
-                        program['id'],
-                        program['ProductName'],
-                        None,
-                        LicenseInfo(LicenseType.SinglePurchase, None)
+                fixed_game = check_available_fixes(program['id'], program['ProductName'])
+
+                if fixed_game is not None:
+                    logger.info("A fix is available for the game")
+                    self.owned_games_cache.append(fixed_game)
+                else:
+                    self.owned_games_cache.append(
+                        Game(
+                            program['id'],
+                            program['ProductName'],
+                            None,
+                            LicenseInfo(LicenseType.SinglePurchase, None)
+                        )
                     )
-                )
 
         return self.owned_games_cache
 
