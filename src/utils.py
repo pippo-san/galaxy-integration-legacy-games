@@ -2,18 +2,15 @@ import winreg as registry
 
 from galaxy.api.plugin import logger
 
-
 def _get_reg_value(regKey, valueKey):
     try:
         return registry.QueryValueEx(regKey, valueKey)[0]
     except OSError:
         return None
 
-
 def get_launcher_path():
     key = registry.HKEY_LOCAL_MACHINE
     subKey = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-    programs = []
     regKey = registry.OpenKey(key, subKey)
     keys, _, _ = registry.QueryInfoKey(regKey)
     logger.info("Searching for launcher path")
@@ -29,7 +26,6 @@ def get_launcher_path():
                     return launcherPath
     logger.info("Launcher path not found")
     return None
-
 
 def get_uninstall_programs_list():
     key = registry.HKEY_CURRENT_USER

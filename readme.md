@@ -7,6 +7,10 @@
 - Uninstall games
 - Playing status
 
+## Issues
+- launcher may require admin privileges, in that case, won't be possible to launch it. If doing so, next time you'll open the launcher, it will show up as in offline mode.
+- uninstalling a game may not update the installed status on Galaxy until doing a reboot, I'm working on a fix
+
 ## Credits
 The plugin is based on work done by others, especially from:
 - https://github.com/Rall3n/galaxy-integration-amazon used as a base for this plugin

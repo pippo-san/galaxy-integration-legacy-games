@@ -93,12 +93,12 @@ class LegacyGamesPlugin(Plugin):
                     logger.info("nope")
                     continue
 
-                # lista dei giochi con percorso d'installazione ed eseguibile
+                # games list with install directory and exe
                 self.games.append(
                     [program['id'], program['InstDir'], program['GameExe']]
                 )
 
-                # lista Galaxy dei giochi
+                # Galaxy games list
                 logger.info("Game " + program['id'] + " added to games cache")
 
                 self.owned_games_cache.append(
@@ -118,7 +118,8 @@ class LegacyGamesPlugin(Plugin):
     async def launch_game(self, game_id: str) -> None:
         for game in self.games:
             if game[0] == game_id:
-                subprocess.Popen(game[1] + r"\\" + game[2])  # lancio il gioco dall'eseguibile
+                # launch game from exe
+                subprocess.Popen(game[1] + r"\\" + game[2])
                 # Set game as running
                 logger.info("Game " + game[0] + " is running")
                 Plugin.update_local_game_status(self,
@@ -134,15 +135,15 @@ class LegacyGamesPlugin(Plugin):
         for game in self.games:
             if game[0] == game_id:
                 subprocess.Popen(
-                    game[1] + "\\Uninstall.exe")  # disinstallo il gioco dall'eseguibile, uguale per tutti
+                    game[1] + "\\Uninstall.exe")  # uninstall game from exe, common to all games
 
         # self.update_local_game_status(LocalGame(game_id, LocalGameState.None_))
         # self._local_games_cache.pop(game_id)
 
-    # aggiungo solo giochi installati
     def local_games_list(self):
         self.local_games_status.clear()
 
+        # only adding installed games
         for game in self.games:
             logger.info(game)
             # logger.info("Inserisco | " + game[0] + " | fra i giochi locali")
