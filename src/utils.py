@@ -1,6 +1,20 @@
+import json
+import os
 import winreg as registry
 
 from galaxy.api.plugin import logger
+
+def open_launcher_config_file():
+    logger.info("opening json")
+    path = os.getenv('APPDATA')
+
+    launcherJSON = path + "\\legacy-games-launcher\\app-state.json"
+
+    file = open(launcherJSON, encoding="utf8")
+    f = json.load(file)
+
+    return f
+
 
 def _get_reg_value(regKey, valueKey):
     try:

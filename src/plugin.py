@@ -1,4 +1,3 @@
-import json
 import os
 import subprocess
 import sys
@@ -12,22 +11,9 @@ from galaxy.api.types import Authentication, Game, LocalGame, LicenseInfo, NextS
 from galaxy.proc_tools import process_iter
 
 from client import LegacyGamesClient
-from utils import get_uninstall_programs_list
+from utils import get_uninstall_programs_list, open_launcher_config_file
 
 __version__ = 0.1
-
-# load launcher configuration
-logger.info("opening json")
-path = os.getenv('APPDATA')
-
-launcherJSON = path + "\\legacy-games-launcher\\app-state.json"
-
-file = open(launcherJSON, encoding="utf8")
-f = json.load(file)
-
-username = f["user"]["profile"]["username"]
-# userId = f["user"]["profile"]["id"]
-install_path = f["settings"]["gameLibraryPath"][0]
 
 # LOCAL_GAMES_TIMEOUT = (1 * 60)
 OWNED_GAMES_TIMEOUT = (10 * 60)
@@ -51,19 +37,25 @@ class LegacyGamesPlugin(Plugin):
         self.owned_games_cache = []  # Game obj
         self.local_games_status = []  # LocalGame obj
 
+        self.config_file = open_launcher_config_file()
+
+        self.username = self.config_file["user"]["profile"]["username"]
+        # userId = f["user"]["profile"]["id"]
+        self.install_path = self.config_file["settings"]["gameLibraryPath"][0]
+
     async def authenticate(self, stored_credentials=None):
         logger.info("started authentication")
-        user_data = {'username': username}
+        user_data = {'username': self.username}
         self.store_credentials(user_data)
-        return Authentication("LegacyGames", username)
+        return Authentication("LegacyGames", self.username)
 
     async def pass_login_credentials(self, step: str, credentials: Dict[str, str], cookies: List[Dict[str, str]]) -> \
             Union[NextStep, Authentication]:
         logger.info("passing cached login credentials")
         logger.info("started authentication")
-        user_data = {'username': username}
+        user_data = {'username': self.username}
         self.store_credentials(user_data)
-        return Authentication("LegacyGames", username)
+        return Authentication("LegacyGames", self.username)
 
     async def launch_platform_client(self):
         LegacyGamesClient.start_client()
@@ -74,10 +66,37 @@ class LegacyGamesPlugin(Plugin):
     async def get_os_compatibility(self, game_id, context):
         return OSCompatibility.Windows
 
+    def get_giveaway_games(self):
+        for game in self.config_file["user"]["giveawayDownloads"]:
+            game_id = game["installer_uuid"]
+            self.games.append(
+                [game_id, None, None]
+            )
+            game_name = self.find_game_title(game['installer_uuid'])
+            logger.info("Game " + game['installer_uuid'] + " added to owned games, with name" + game_name)
+            self.owned_games_cache.append(
+                Game(
+                    game["installer_uuid"],
+                    game_name,
+                    None,
+                    LicenseInfo(LicenseType.SinglePurchase, None)
+                )
+            )
+
+        return self.owned_games_cache
+
+    def find_game_title(self, installer_uuid):
+        for entry in self.config_file["siteData"]["giveawayCatalog"]:
+            for game in entry["games"]:
+                if game["installer_uuid"] == installer_uuid:
+                    print(game["game_name"])
+                    return game["game_name"]
+
     async def get_owned_games(self) -> List[Game]:
         # Clear games list from previously imported games
         self.games.clear()
         self.owned_games_cache.clear()
+        self.get_giveaway_games()
 
         get_games = get_uninstall_programs_list()
         logger.info(get_games)
@@ -92,6 +111,9 @@ class LegacyGamesPlugin(Plugin):
                     logger.info("program isn't installed")
                     logger.info("nope")
                     continue
+
+                # So we don't have multiple entries of the same game
+                self.delete_existent_game_entry(program['id'])
 
                 # games list with install directory and exe
                 self.games.append(
@@ -111,6 +133,12 @@ class LegacyGamesPlugin(Plugin):
                 )
 
         return self.owned_games_cache
+
+    def delete_existent_game_entry(self, installer_uuid):
+        # Searches for owned games which are already installed and marks them as installed with proper game path
+        for owned_game in self.games:
+            if owned_game[0] == installer_uuid:
+                self.games.remove(owned_game)
 
     async def get_local_games(self):
         return self.local_games_list()
@@ -146,13 +174,23 @@ class LegacyGamesPlugin(Plugin):
         # only adding installed games
         for game in self.games:
             logger.info(game)
-            # logger.info("Inserisco | " + game[0] + " | fra i giochi locali")
-            self.local_games_status.append(
-                LocalGame(
-                    str(game[0]),
-                    LocalGameState.Installed
+
+            if game[1] is None:
+                # Game not installed
+                self.local_games_status.append(
+                    LocalGame(
+                        str(game[0]),
+                        LocalGameState.None_
+                    )
                 )
-            )
+            else:
+                # Game installed
+                self.local_games_status.append(
+                    LocalGame(
+                        str(game[0]),
+                        LocalGameState.Installed
+                    )
+                )
         return self.local_games_status
 
     def is_running(self, game_id: str):
