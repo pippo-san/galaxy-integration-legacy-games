@@ -73,7 +73,7 @@ class LegacyGamesPlugin(Plugin):
                 [game_id, None, None]
             )
             game_name = self.find_game_title(game['installer_uuid'])
-            logger.info("Game " + game['installer_uuid'] + " added to owned games, with name" + game_name)
+            logger.info("Game " + game['installer_uuid'] + " added to owned games, with name " + game_name)
             self.owned_games_cache.append(
                 Game(
                     game["installer_uuid"],

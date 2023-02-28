@@ -1,8 +1,11 @@
 import json
 import os
 import winreg as registry
+from pathlib import Path
 
 from galaxy.api.plugin import logger
+from galaxy.proc_tools import process_iter
+
 
 def open_launcher_config_file():
     logger.info("opening json")
@@ -21,6 +24,12 @@ def _get_reg_value(regKey, valueKey):
         return registry.QueryValueEx(regKey, valueKey)[0]
     except OSError:
         return None
+
+def is_running(program_path: Path):
+    for proc in process_iter():
+        if proc.binary_path and Path(proc.binary_path).resolve() == program_path:
+            return True
+    return False
 
 def get_launcher_path():
     key = registry.HKEY_LOCAL_MACHINE
