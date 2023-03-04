@@ -102,7 +102,7 @@ class LegacyGamesPlugin(Plugin):
                 # lista Galaxy dei giochi
                 logger.info("Game " + program['id'] + " added to games cache")
 
-                fixed_game = check_available_fixes(program['id'], program['ProductName'])
+                fixed_game = check_available_fixes(program['id'])
 
                 if fixed_game is not None:
                     logger.info("A fix is available for the game")
