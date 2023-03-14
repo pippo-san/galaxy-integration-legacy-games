@@ -10,8 +10,8 @@ from galaxy.api.plugin import Plugin, create_and_run_plugin, logger
 from galaxy.api.types import Authentication, Game, LocalGame, LicenseInfo, NextStep
 from galaxy.proc_tools import process_iter
 
-from client import LegacyGamesClient
-from utils import get_uninstall_programs_list, open_launcher_config_file
+from client import LegacyGamesClient, open_launcher_config_file
+from utils import get_uninstall_programs_list
 
 __version__ = 0.1
 
@@ -32,7 +32,7 @@ class LegacyGamesPlugin(Plugin):
             token
         )
 
-        self.client_path = LegacyGamesClient()
+        self.client = LegacyGamesClient()
         self.games = []  # [id, InstDir, GameExe]
         self.owned_games_cache = []  # Game obj
         self.local_games_status = []  # LocalGame obj
@@ -57,11 +57,11 @@ class LegacyGamesPlugin(Plugin):
         self.store_credentials(user_data)
         return Authentication("LegacyGames", self.username)
 
-    async def launch_platform_client(self):
-        LegacyGamesClient.start_client()
+    def launch_platform_client(self):
+        self.client.start_client()
 
     async def shutdown_platform_client(self):
-        self.client_path.stop_client()
+        self.client.stop_client()
 
     async def get_os_compatibility(self, game_id, context):
         return OSCompatibility.Windows
@@ -157,7 +157,7 @@ class LegacyGamesPlugin(Plugin):
                         local_game.local_game_state = LocalGameState.Installed | LocalGameState.Running
 
     async def install_game(self, game_id: str) -> None:
-        await self.launch_platform_client()
+        self.launch_platform_client()
 
     async def uninstall_game(self, game_id: str) -> None:
         for game in self.games:
