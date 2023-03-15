@@ -109,7 +109,6 @@ class LegacyGamesPlugin(Plugin):
 
                 if not os.path.exists(os.path.abspath(program['InstDir'])):
                     logger.info("program isn't installed")
-                    logger.info("nope")
                     continue
 
                 # So we don't have multiple entries of the same game
@@ -164,9 +163,6 @@ class LegacyGamesPlugin(Plugin):
             if game[0] == game_id:
                 subprocess.Popen(
                     game[1] + "\\Uninstall.exe")  # uninstall game from exe, common to all games
-
-        # self.update_local_game_status(LocalGame(game_id, LocalGameState.None_))
-        # self._local_games_cache.pop(game_id)
 
     def local_games_list(self):
         self.local_games_status.clear()
