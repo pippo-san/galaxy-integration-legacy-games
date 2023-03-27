@@ -32,7 +32,7 @@ class LegacyGamesClient:
     @property
     def is_running(self):
         for proc in process_iter():
-            if proc.binary_path and Path(proc.binary_path).resolve() == self.exec_path:
+            if proc.binary_path and Path(proc.binary_path).resolve() == Path(self.exec_path).resolve():
                 return True
 
         return False
@@ -42,16 +42,15 @@ class LegacyGamesClient:
         if not self.install_location:
             return ''
 
-        return self.install_location.joinpath("Legacy Games Launcher.exe")
+        return self.install_location + '\Legacy Games Launcher.exe'
 
     def start_client(self):
         if self.install_location is not None:
-            logger.info(os.system('"' + self.install_location + '\Legacy Games Launcher.exe' + '"'))
+            os.system('"' + self.install_location + '\Legacy Games Launcher.exe' + '"')
 
     def stop_client(self):
         if self.is_running:
-            LegacyGamesClient._exec(f'taskkill /t /f /im "Legacy Games Launcher.exe"')
-
+            os.system('taskkill /t /f /im "Legacy Games Launcher.exe')
 
 def open_launcher_config_file():
     logger.info("opening json")

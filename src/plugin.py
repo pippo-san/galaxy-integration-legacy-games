@@ -1,3 +1,4 @@
+import ctypes
 import os
 import subprocess
 import sys
@@ -61,7 +62,8 @@ class LegacyGamesPlugin(Plugin):
         self.client.start_client()
 
     async def shutdown_platform_client(self):
-        self.client.stop_client()
+        # the code is there, but killing a 64 bit process in a 32bit environment isn't easy
+        pass
 
     async def get_os_compatibility(self, game_id, context):
         return OSCompatibility.Windows
