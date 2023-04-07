@@ -1,3 +1,4 @@
+import ctypes
 import os
 import subprocess
 import sys
@@ -10,8 +11,9 @@ from galaxy.api.plugin import Plugin, create_and_run_plugin, logger
 from galaxy.api.types import Authentication, Game, LocalGame, LicenseInfo, NextStep
 from galaxy.proc_tools import process_iter
 
-from client import LegacyGamesClient
-from utils import get_uninstall_programs_list, open_launcher_config_file
+from client import LegacyGamesClient, open_launcher_config_file
+from utils import get_uninstall_programs_list
+from game_fixes import check_available_fixes
 
 __version__ = 0.1
 
@@ -32,15 +34,19 @@ class LegacyGamesPlugin(Plugin):
             token
         )
 
-        self.client_path = LegacyGamesClient()
+        self.client = LegacyGamesClient()
         self.games = []  # [id, InstDir, GameExe]
         self.owned_games_cache = []  # Game obj
         self.local_games_status = []  # LocalGame obj
 
         self.config_file = open_launcher_config_file()
 
-        self.username = self.config_file["user"]["profile"]["username"]
-        # userId = f["user"]["profile"]["id"]
+        try:
+            self.username = self.config_file["user"]["profile"]["username"]
+            # userId = f["user"]["profile"]["id"]
+        except KeyError:
+            self.username = "Legacy Games User"
+
         self.install_path = self.config_file["settings"]["gameLibraryPath"][0]
 
     async def authenticate(self, stored_credentials=None):
@@ -57,11 +63,12 @@ class LegacyGamesPlugin(Plugin):
         self.store_credentials(user_data)
         return Authentication("LegacyGames", self.username)
 
-    async def launch_platform_client(self):
-        LegacyGamesClient.start_client()
+    def launch_platform_client(self):
+        self.client.start_client()
 
     async def shutdown_platform_client(self):
-        self.client_path.stop_client()
+        # the code is there, but killing a 64 bit process in a 32bit environment isn't easy
+        pass
 
     async def get_os_compatibility(self, game_id, context):
         return OSCompatibility.Windows
@@ -73,15 +80,23 @@ class LegacyGamesPlugin(Plugin):
                 [game_id, None, None]
             )
             game_name = self.find_game_title(game['installer_uuid'])
+
+            # Check for library fixes
+            fixed_game = check_available_fixes(game['installer_uuid'])
+
             logger.info("Game " + game['installer_uuid'] + " added to owned games, with name " + game_name)
-            self.owned_games_cache.append(
-                Game(
-                    game["installer_uuid"],
-                    game_name,
-                    None,
-                    LicenseInfo(LicenseType.SinglePurchase, None)
+            if fixed_game is not None:
+                logger.info("A fix is available for the game " + game['installer_uuid'])
+                self.owned_games_cache.append(fixed_game)
+            else:
+                self.owned_games_cache.append(
+                    Game(
+                        game['installer_uuid'],
+                        game_name,
+                        None,
+                        LicenseInfo(LicenseType.SinglePurchase, None)
+                    )
                 )
-            )
 
         return self.owned_games_cache
 
@@ -109,7 +124,6 @@ class LegacyGamesPlugin(Plugin):
 
                 if not os.path.exists(os.path.abspath(program['InstDir'])):
                     logger.info("program isn't installed")
-                    logger.info("nope")
                     continue
 
                 # So we don't have multiple entries of the same game
@@ -123,14 +137,21 @@ class LegacyGamesPlugin(Plugin):
                 # Galaxy games list
                 logger.info("Game " + program['id'] + " added to games cache")
 
-                self.owned_games_cache.append(
-                    Game(
-                        program['id'],
-                        program['ProductName'],
-                        None,
-                        LicenseInfo(LicenseType.SinglePurchase, None)
+                # Check for library fixes
+                fixed_game = check_available_fixes(program['id'])
+
+                if fixed_game is not None:
+                    logger.info("A fix is available for the game "+program['id'])
+                    self.owned_games_cache.append(fixed_game)
+                else:
+                    self.owned_games_cache.append(
+                        Game(
+                            program['id'],
+                            program['ProductName'],
+                            None,
+                            LicenseInfo(LicenseType.SinglePurchase, None)
+                        )
                     )
-                )
 
         return self.owned_games_cache
 
@@ -157,16 +178,13 @@ class LegacyGamesPlugin(Plugin):
                         local_game.local_game_state = LocalGameState.Installed | LocalGameState.Running
 
     async def install_game(self, game_id: str) -> None:
-        await self.launch_platform_client()
+        self.launch_platform_client()
 
     async def uninstall_game(self, game_id: str) -> None:
         for game in self.games:
             if game[0] == game_id:
                 subprocess.Popen(
                     game[1] + "\\Uninstall.exe")  # uninstall game from exe, common to all games
-
-        # self.update_local_game_status(LocalGame(game_id, LocalGameState.None_))
-        # self._local_games_cache.pop(game_id)
 
     def local_games_list(self):
         self.local_games_status.clear()
