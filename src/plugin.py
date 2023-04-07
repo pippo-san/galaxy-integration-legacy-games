@@ -40,8 +40,12 @@ class LegacyGamesPlugin(Plugin):
 
         self.config_file = open_launcher_config_file()
 
-        self.username = self.config_file["user"]["profile"]["username"]
-        # userId = f["user"]["profile"]["id"]
+        try:
+            self.username = self.config_file["user"]["profile"]["username"]
+            # userId = f["user"]["profile"]["id"]
+        except KeyError:
+            self.username = "Legacy Games User"
+
         self.install_path = self.config_file["settings"]["gameLibraryPath"][0]
 
     async def authenticate(self, stored_credentials=None):
