@@ -9,7 +9,11 @@ fixes = {
     "The Wild Case": {
         "guid": "fad5198e-5c92-4493-b498-d77dc0ba6111",
         "ProductName": "The Wild Case (2021)"
-    }
+    },
+    "City Legends: Trapped In Mirror CE": {
+            "guid": "b8cd4707-bc1d-44c4-90a2-04a07e24640f",
+            "ProductName": "City Legends: Trapped In Mirror - Collector's Edition"
+        }
 }
 
 
