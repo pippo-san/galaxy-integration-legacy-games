@@ -4,14 +4,14 @@
 ## Currently supported features
 - Import installed games
 - Import games redeemed from Amazon Prime
+- Install games (*)
 - Launch games
-- install games (*)
-- Uninstall games
 - Playing status
+- Uninstall games
 
 ## Issues
 - (*) clicking the "install" button on a game will open the launcher as intended, but until it isn't closed, the plugin will be marked as offline; in that case you'll have to press the "retry" button to make it working again
-- (*)the "install" button may appear and disappear randomly
+- (*) the "install" button may appear and disappear randomly
 - uninstalling a game may not update the installed status on Galaxy until doing a reboot, I'm working on a fix (low priority)
 
 ## Credits

@@ -80,15 +80,23 @@ class LegacyGamesPlugin(Plugin):
                 [game_id, None, None]
             )
             game_name = self.find_game_title(game['installer_uuid'])
-            logger.info("Game " + game['installer_uuid'] + " added to owned games, with name" + game_name)
-            self.owned_games_cache.append(
-                Game(
-                    game["installer_uuid"],
-                    game_name,
-                    None,
-                    LicenseInfo(LicenseType.SinglePurchase, None)
+
+            # Check for library fixes
+            fixed_game = check_available_fixes(game['installer_uuid'])
+
+            logger.info("Game " + game['installer_uuid'] + " added to owned games, with name " + game_name)
+            if fixed_game is not None:
+                logger.info("A fix is available for the game " + game['installer_uuid'])
+                self.owned_games_cache.append(fixed_game)
+            else:
+                self.owned_games_cache.append(
+                    Game(
+                        game['installer_uuid'],
+                        game_name,
+                        None,
+                        LicenseInfo(LicenseType.SinglePurchase, None)
+                    )
                 )
-            )
 
         return self.owned_games_cache
 
@@ -129,10 +137,11 @@ class LegacyGamesPlugin(Plugin):
                 # Galaxy games list
                 logger.info("Game " + program['id'] + " added to games cache")
 
+                # Check for library fixes
                 fixed_game = check_available_fixes(program['id'])
 
                 if fixed_game is not None:
-                    logger.info("A fix is available for the game")
+                    logger.info("A fix is available for the game "+program['id'])
                     self.owned_games_cache.append(fixed_game)
                 else:
                     self.owned_games_cache.append(
