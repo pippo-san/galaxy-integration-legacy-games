@@ -13,6 +13,10 @@ fixes = {
     "City Legends: Trapped In Mirror CE": {
             "guid": "b8cd4707-bc1d-44c4-90a2-04a07e24640f",
             "ProductName": "City Legends: Trapped In Mirror - Collector's Edition"
+        },
+    "Road Trip: USA 2 West CE": {
+            "guid": "b839c68a-1626-46c7-a378-5625395e95ad",
+            "ProductName": "Road Trip: USA 2 West Collector's Edition"
         }
 }
 
