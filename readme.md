@@ -8,6 +8,7 @@
 - Launch games
 - Playing status
 - Uninstall games
+- Game time (when launched trough Galaxy)
 
 ## Issues
 - (*) clicking the "install" button on a game will open the launcher as intended, but the plugin will be marked as offline; in that case, you'll have to press the "retry" button on the integrations page to make it working again
