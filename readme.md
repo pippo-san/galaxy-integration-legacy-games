@@ -18,3 +18,5 @@
 The plugin is based on work done by others, especially from:
 - https://github.com/Rall3n/galaxy-integration-amazon used as a base for this plugin
 - https://github.com/Jeshibu/PlayniteExtensions/tree/main/source/LegacyGamesLibrary used for learning how the Legacy Games Launcher backend works
+
+I would also like to thank you, @tylerbrawl, for creating the awesome [Galaxy-Utils](https://github.com/tylerbrawl/Galaxy-Utils), because, without them, time tracking wouldn't have been so easy to implement

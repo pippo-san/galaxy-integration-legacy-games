@@ -1,15 +1,16 @@
-import ctypes
 import os
+import pickle
 import subprocess
 import sys
 from pathlib import Path
 from time import time
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Any
 
-from galaxy.api.consts import Platform, OSCompatibility, LocalGameState, LicenseType
+from galaxy.api.consts import Platform, OSCompatibility, LocalGameState, LicenseType, Feature
 from galaxy.api.plugin import Plugin, create_and_run_plugin, logger
-from galaxy.api.types import Authentication, Game, LocalGame, LicenseInfo, NextStep
+from galaxy.api.types import Authentication, Game, LocalGame, LicenseInfo, NextStep, GameTime
 from galaxy.proc_tools import process_iter
+from galaxyutils.time_tracker import TimeTracker, GameNotTrackedException
 
 from client import LegacyGamesClient, open_launcher_config_file
 from utils import get_uninstall_programs_list
@@ -34,6 +35,13 @@ class LegacyGamesPlugin(Plugin):
             token
         )
 
+        self.game_time_cache = None
+        try:
+            self.game_time_cache = pickle.loads(bytes.fromhex(self.persistent_cache["game_time_cache"]))
+            self.game_time_tracker = TimeTracker(game_time_cache=self.game_time_cache)
+        except Exception:
+            self.game_time_tracker = TimeTracker()
+
         self.client = LegacyGamesClient()
         self.games = []  # [id, InstDir, GameExe]
         self.owned_games_cache = []  # Game obj
@@ -48,6 +56,14 @@ class LegacyGamesPlugin(Plugin):
             self.username = "Legacy Games User"
 
         self.install_path = self.config_file["settings"]["gameLibraryPath"][0]
+
+    async def get_game_time(self, game_id: str, context: Any) -> GameTime:
+        try:
+            game_time = self.game_time_tracker.get_tracked_time(game_id)
+        except GameNotTrackedException:
+            # Game never tracked
+            game_time = None
+        return game_time
 
     async def authenticate(self, stored_credentials=None):
         logger.info("started authentication")
@@ -177,6 +193,9 @@ class LegacyGamesPlugin(Plugin):
                     if local_game.game_id == game[0]:
                         local_game.local_game_state = LocalGameState.Installed | LocalGameState.Running
 
+                # Start tracking game time
+                self.game_time_tracker.start_tracking_game(game_id)
+
     async def install_game(self, game_id: str) -> None:
         self.launch_platform_client()
 
@@ -247,6 +266,15 @@ class LegacyGamesPlugin(Plugin):
                     logger.info("Game " + game.game_id + " is not running anymore")
                     game.local_game_state = LocalGameState.Installed
                     Plugin.update_local_game_status(self, LocalGame(game.game_id, LocalGameState.Installed))
+
+                    # Stop tracking game time
+                    self.game_time_tracker.stop_tracking_game(game.game_id)
+                    self.update_game_time(self.game_time_tracker.get_tracked_time(game.game_id))
+
+    async def shutdown(self) -> None:
+        logger.debug("Pushing the cache of played game times to the persistent cache...")
+        self.persistent_cache['game_time_cache'] = pickle.dumps(self.game_time_tracker.get_time_cache()).hex()
+        self.push_cache()
 
 
 def main():
