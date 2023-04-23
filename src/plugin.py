@@ -242,12 +242,14 @@ class LegacyGamesPlugin(Plugin):
     def init_game_time_cache(self):
         # Check the persistent cache first.
         if "game_time_cache" in self.persistent_cache:
+            logger.info("Loading game time cache from persistent cache")
             self.game_time_cache = pickle.loads(bytes.fromhex(self.persistent_cache["game_time_cache"]))
         # If the game time cache cannot be found in the persistent cache, then check a local file for it.
         else:
             try:
                 file_location = os.path.join(self.documents_location, "LegacyGamesPlayTimeCache.txt")
                 file = open(file_location, "r")
+                logger.info("Loading game time cache from file")
                 for line in file.readlines():
                     if line[:1] != "#":
                         self.game_time_cache = pickle.loads(bytes.fromhex(line))
