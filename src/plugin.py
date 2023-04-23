@@ -10,7 +10,7 @@ from galaxy.api.consts import Platform, OSCompatibility, LocalGameState, License
 from galaxy.api.plugin import Plugin, create_and_run_plugin, logger
 from galaxy.api.types import Authentication, Game, LocalGame, LicenseInfo, NextStep, GameTime
 from galaxy.proc_tools import process_iter
-from galaxyutils.time_tracker import TimeTracker, GameNotTrackedException
+from galaxyutils.time_tracker import TimeTracker, GameNotTrackedException, GamesStillBeingTrackedException
 
 from client import LegacyGamesClient, open_launcher_config_file
 from utils import get_uninstall_programs_list
@@ -273,7 +273,18 @@ class LegacyGamesPlugin(Plugin):
 
     async def shutdown(self) -> None:
         logger.debug("Pushing the cache of played game times to the persistent cache...")
-        self.persistent_cache['game_time_cache'] = pickle.dumps(self.game_time_tracker.get_time_cache()).hex()
+
+        try:
+            self.game_time_cache = self.game_time_tracker.get_time_cache()
+        except GamesStillBeingTrackedException:
+            for game in self.local_games_status:
+                if game.local_game_state == LocalGameState.Installed | LocalGameState.Running:
+                    self.game_time_tracker.stop_tracking_game(game.game_id)
+
+            self.game_time_cache = self.game_time_tracker.get_time_cache()
+
+        self.persistent_cache['game_time_cache'] = pickle.dumps(self.game_time_cache).hex()
+
         self.push_cache()
 
 
