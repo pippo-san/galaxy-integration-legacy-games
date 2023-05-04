@@ -11,8 +11,7 @@
 - Game time (when launched trough Galaxy)
 
 ## Issues
-- (*) clicking the "install" button on a game will open the launcher as intended, but the plugin will be marked as offline; in that case, you'll have to press the "retry" button on the integrations page to make it working again
-- (*) the "install" button may appear and disappear randomly (if you right-click into the game tile, when on the library view, the install button will always be there)
+- (*) the "install" button may appear and disappear randomly (if you right-click into the game tile, when on the library view, the install button will always be there. May be a galaxy bug)
 - uninstalling a game may not update the installed status on Galaxy until doing a reboot, I'm working on a fix (low priority)
 
 ## Credits
