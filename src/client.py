@@ -46,7 +46,7 @@ class LegacyGamesClient:
 
     def start_client(self):
         if self.install_location is not None:
-            os.system('"' + self.install_location + '\Legacy Games Launcher.exe' + '"')
+            os.startfile('"' + self.install_location + '\Legacy Games Launcher.exe' + '"')
 
     def stop_client(self):
         if self.is_running:
