@@ -29,7 +29,7 @@ class LegacyGamesPlugin(Plugin):
 
     def __init__(self, reader, writer, token):
         super().__init__(
-            Platform.Test,
+            Platform.GameHouse,
             __version__,
             reader,
             writer,

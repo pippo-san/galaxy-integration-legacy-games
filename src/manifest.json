@@ -1,8 +1,8 @@
 {
     "name": "Legacy Games plugin",
-    "platform": "test",
-    "guid": "73d2c048-1ae7-46b2-ad4a-da16ac8ccecc",
+    "platform": "gamehouse",
     "version": "0.3.2",
+    "guid": "73d2c048-1ae7-46b2-ad4a-da16ac8ccecz",
     "description": "Legacy Games plugin",
     "author": "pippo-san",
     "email": "",
