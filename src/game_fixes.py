@@ -21,6 +21,10 @@ fixes = {
     "Looking for Aliens CE": {
             "guid": "88e3219c-13d1-4fbd-a357-f418a5174305",
             "ProductName": "Looking for Aliens Collector's Edition"
+    },
+    "Lilas Sky Ark": {
+            "guid": "cc584db8-0b8b-460c-bf7a-04c958b50008",
+            "ProductName": "Lila's Sky Ark"
     }
 }
 
