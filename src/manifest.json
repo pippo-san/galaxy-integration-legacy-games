@@ -1,8 +1,8 @@
 {
     "name": "Legacy Games plugin",
-    "platform": "gamehouse",
+    "platform": "kartridge",
     "version": "0.3.3",
-    "guid": "73d2c048-1ae7-46b2-ad4a-da16ac8ccecz",
+    "guid": "73d2c048-1ae7-46b2-ad4a-da16yc8ccecz",
     "description": "Legacy Games plugin",
     "author": "pippo-san",
     "email": "",
