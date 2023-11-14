@@ -17,7 +17,7 @@ from client import LegacyGamesClient, open_launcher_config_file
 from utils import get_uninstall_programs_list
 from game_fixes import check_available_fixes
 
-__version__ = "0.3.3"
+__version__ = "0.3.4"
 
 # LOCAL_GAMES_TIMEOUT = (1 * 60)
 OWNED_GAMES_TIMEOUT = (10 * 60)

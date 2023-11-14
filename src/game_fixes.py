@@ -25,6 +25,10 @@ fixes = {
     "Lilas Sky Ark": {
             "guid": "cc584db8-0b8b-460c-bf7a-04c958b50008",
             "ProductName": "Lila's Sky Ark"
+    },
+    "Unsolved Case: Murderous Script CE": {
+            "guid": "988f9e23-8c54-45ad-a236-57637dee5e18",
+            "ProductName": "Unsolved Case: Murderous Script - Collector's Edition"
     }
 }
 
