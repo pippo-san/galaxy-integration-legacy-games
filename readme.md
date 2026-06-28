@@ -13,7 +13,7 @@ This plugin is only supported on Windows and requires the Legacy Games Launcher 
 - Game time (when launched trough Galaxy)
 
 ## Installation
-1) Download the latest version avaliable of the integration, making sure to select the correct one in regards to the installed GOG Galaxy version (2.1 for 2.1 version and above, otherwise use 2.0)
+1) Download the [latest version avaliable](https://github.com/pippo-san/galaxy-integration-legacy-games/releases/latest) of the integration, making sure to select the correct one in regards to the installed GOG Galaxy version (2.1 for 2.1 version and above, otherwise use 2.0)
 2) unzip the folder into `%LOCALAPPDATA%\GOG.com\Galaxy\plugins\installed`. The directory tree should look like this:
 
 ```
