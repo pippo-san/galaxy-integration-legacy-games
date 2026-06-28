@@ -7,7 +7,7 @@ from pathlib import Path
 from time import time
 from typing import List, Dict, Union, Any
 
-from galaxy.api.consts import Platform, OSCompatibility, LocalGameState, LicenseType, Feature
+from galaxy.api.consts import Platform, OSCompatibility, LocalGameState, LicenseType
 from galaxy.api.plugin import Plugin, create_and_run_plugin, logger
 from galaxy.api.types import Authentication, Game, LocalGame, LicenseInfo, NextStep, GameTime
 from galaxy.proc_tools import process_iter
@@ -17,7 +17,7 @@ from client import LegacyGamesClient, open_launcher_config_file
 from utils import get_uninstall_programs_list
 from game_fixes import check_available_fixes
 
-__version__ = "0.3.4"
+__version__ = "0.3.5"
 
 # LOCAL_GAMES_TIMEOUT = (1 * 60)
 OWNED_GAMES_TIMEOUT = (10 * 60)
@@ -118,6 +118,7 @@ class LegacyGamesPlugin(Plugin):
                 if game["installer_uuid"] == installer_uuid:
                     print(game["game_name"])
                     return game["game_name"]
+        return ""
 
     async def get_owned_games(self) -> List[Game]:
         # Clear games list from previously imported games

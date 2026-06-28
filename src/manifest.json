@@ -1,7 +1,7 @@
 {
     "name": "Legacy Games plugin",
     "platform": "kartridge",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "guid": "73d2c048-1ae7-46b2-ad4a-da16yc8ccecz",
     "description": "Legacy Games plugin",
     "author": "pippo-san",
